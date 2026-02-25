@@ -4,7 +4,15 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
+
+//? POSTGRES
+//! npm i pg
+//! npm i @types/pg
+
+//? MYSQL
+//! npm i mysql2
+//! npm i @types/mysql

@@ -1,34 +1,33 @@
-import { Controller, Delete, Get, Param, Post, Put, Body, ParseIntPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from '../auth/dto/create-task.dto';
 
 @Controller('api/task')
 export class TaskController {
-    constructor(private taskSvc: TaskService) { }
+  constructor(private readonly taskSvc: TaskService) { }
 
-    @Get()
-    public getTask(): any[] {
-        return this.taskSvc.getTask();
-    }
+  @Get()
+  public async getTask(): Promise<any> {
+    return await this.taskSvc.getTasks();
+  }
 
-    @Get(":id")
-    public getTaskById(@Param("id", ParseIntPipe) id: number, @Body() task: any) {
-        console.log(typeof id);
-        return this.taskSvc.getTaskById(id);
-    }
+  @Get(':id')
+  public async getTaskById(@Param("id", ParseIntPipe) id: number): Promise<any> {
+    return await this.taskSvc.getTaskById(id);
+  }
 
-    @Post()
-    public insertTask(@Body() task: CreateTaskDto): string {
-        return this.taskSvc.insert(task);
-    }
+  @Post()
+  public insertTask(@Body() task: CreateTaskDto) {
+    return this.taskSvc.insertTask(task);
+  }
 
-    @Put("/:id")
-    public updateTask(@Param("id", ParseIntPipe) id: number, @Body() task: any) {
-        return this.taskSvc.update(id, task);
-    }
+  @Put(":id")
+  public updateTask(@Param("id", ParseIntPipe) id: number,@Body() task: any) {
+    return this.taskSvc.updateTask(id, task);
+  }
 
-    @Delete("/:id")
-    public deleteTask(@Param("id") id: string) {
-        return this.taskSvc.delete(parseInt(id));
-    }
+  @Delete(':id')
+  public deleteTask(@Param("id", ParseIntPipe) id: number) {
+    return this.taskSvc.deleteTask(id);
+  }
 }
