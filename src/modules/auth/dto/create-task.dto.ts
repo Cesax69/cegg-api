@@ -1,3 +1,4 @@
+import { ApiProperty } from "@nestjs/swagger";
 import { 
     IsBoolean, 
     IsInt, 
@@ -16,6 +17,7 @@ export class CreateTaskDto {
     @IsNotEmpty()
     @MinLength(3, { message: "El nombre debe tener al menos 3 caracteres" })
     @MaxLength(50, { message: "El nombre no debe exceder los 50 caracteres" }) 
+    @ApiProperty({ description: "Nombre de la tarea" })
     name: string | undefined;
 
     @IsString({ message: "La descripción debe ser un texto" })

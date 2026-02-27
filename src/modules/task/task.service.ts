@@ -29,25 +29,36 @@ export class TaskService {
     }
 
     async updateTask(id: number, taskUpdate: UpdateTaskDto): Promise<any> {
-       const task = await this.getTaskById(id);
-       
-       task.name = taskUpdate.name ? taskUpdate.name : task.name;
-       task.description = taskUpdate.description ?? task.description;
-       task.priority = taskUpdate.priority ?? task.priority;
-       
-       //Conertir el objeto a un SET
-       //{ name : 'abc', description : 'abc'}
-       //name='', description''
-       //const set = Object.entries(taskUpdate)
-       //.map(([key, value]) => `${key} = '${value}'`)
-      // .join(', ');
-      //git commit -a -m "fix: CRUD a base de datos MYSQL (list, listById, insert)"
+        const task = await this.getTaskById(id);
+
+        task.name = taskUpdate.name ? taskUpdate.name : task.name;
+        task.description = taskUpdate.description ?? task.description;
+        task.priority = taskUpdate.priority ?? task.priority;
+
+        const query = `UPDATE tasks
+       SET name = '${task.name}',
+       description= '${task.description}',
+       priority= ${task.prioryty}
+       WHERE id = ${task.id}`;
+
+        await this.db.query(query);
+
+        return await this.getTaskById(id);
+
+
+        //Conertir el objeto a un SET
+        //{ name : 'abc', description : 'abc'}
+        //name='', description''
+        //const set = Object.entries(taskUpdate)
+        //.map(([key, value]) => `${key} = '${value}'`)
+        // .join(', ');
+        //git commit -a -m "fix: CRUD a base de datos MYSQL (list, listById, insert)"
     }
 
-    deleteTask(id: number): string {
-        const array = this.tasks.filter(task => task.id !== id);
-        this.tasks = array;
+    async deleteTask(id: number): Promise<boolean> {
+        const query = `DELETE FROM tasks WHERE id = ${id}`;
+        const [result] = await this.db.query(query);
 
-        return "Tarea eliminada correctamente";
+        return result.affectedRows > 0;
     }
 }

@@ -2,18 +2,21 @@ import { Body, Controller, Delete, Get, HttpException, HttpStatus, NotFoundExcep
 import { TaskService } from './task.service';
 import { CreateTaskDto } from '../auth/dto/create-task.dto';
 import { UpdateTaskDto } from '../auth/dto/update.task.dto';
+import { Task } from '../auth/entities/task.entity';
+import { ApiProperty, ApiTags } from '@nestjs/swagger';
 
 @Controller('api/task')
+@ApiTags('Tareas')
 export class TaskController {
   constructor(private readonly taskSvc: TaskService) { }
 
   @Get()
-  public async getTask(): Promise<any> {
+  public async getTask(): Promise<Task[]> {
     return await this.taskSvc.getTasks();
   }
 
   @Get(':id')
-  public async getTaskById(@Param("id", ParseIntPipe) id: number): Promise<any> {
+  public async getTaskById(@Param("id", ParseIntPipe) id: number): Promise<Task> {
     const result = await this.taskSvc.getTaskById(id);
     console.log("resultado",result);
   
@@ -25,7 +28,8 @@ export class TaskController {
   }
 
   @Post()
-  public insertTask(@Body() task: CreateTaskDto) {
+  @ApiProperty({ description: "Insertar una nueva tarea" })
+  public insertTask(@Body() task: CreateTaskDto): Promise<Task> {
     const result = this.taskSvc.insertTasks(task);
 
     if (result == undefined)
@@ -35,12 +39,17 @@ export class TaskController {
   }
 
   @Put(":id")
-  public updateTask(@Param("id", ParseIntPipe) id: number,@Body() task: UpdateTaskDto) {
+  public updateTask(@Param("id", ParseIntPipe) id: number,@Body() task: UpdateTaskDto): Promise<Task> {
     return this.taskSvc.updateTask(id, task);
   }
 
   @Delete(':id')
-  public deleteTask(@Param("id", ParseIntPipe) id: number) {
-    return this.taskSvc.deleteTask(id);
+  public async deleteTask(@Param("id", ParseIntPipe) id: number): Promise<boolean> {
+    const result = await this.taskSvc.deleteTask(id);
+
+    if (!result)
+      throw new HttpException("No se puede eliminar la tarea", HttpStatus.NOT_FOUND)
+      
+    return result;
   }
 }
