@@ -30,5 +30,3 @@ async function bootstrap() {
 //! npm i @types/mysql
 
 //!npm i @nestjs/swagger
-
-//! git commit -a -m "fix: Correcion del CRUD y uso de Swagger"
