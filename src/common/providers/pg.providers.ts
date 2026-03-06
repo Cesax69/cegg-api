@@ -3,11 +3,11 @@ export const pgProvider = [{
     useFactory: async () => {
         const { Client } = require('pg');
         const client = new Client({
-            host: 'localhost', 
+            host: 'localhost',
             port: 5432,
-            user: 'postgres', 
-            password: 'linux', 
-            database: 'bgma_db' 
+            user: 'postgres',
+            password: 'linux123',
+            database: 'bgma_db'
         });
 
         await client.connect();
