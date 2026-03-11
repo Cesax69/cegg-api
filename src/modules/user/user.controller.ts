@@ -4,11 +4,12 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { ApiTags } from '@nestjs/swagger';
+import { UtilService } from 'src/common/services/util.service';
 
 @Controller('api/user')
 @ApiTags('Usuarios')
 export class UserController {
-    constructor(private readonly userSvc: UserService) { }
+    constructor(private readonly userSvc: UserService, private readonly utilSvc: UtilService) { }
 
     @Get()
     public async getUsers(): Promise<User[]> {
@@ -26,8 +27,11 @@ export class UserController {
     }
 
     @Post()
-    public insertUser(@Body() user: CreateUserDto): Promise<User> {
-        const result = this.userSvc.insertUser(user);
+    public async insertUser(@Body() user: CreateUserDto): Promise<User> {
+        const encryptedPassword = await this.utilSvc.hashPassword(user.password);
+        user.password = encryptedPassword;
+        
+        const result = await this.userSvc.insertUser(user);
 
         if (result == undefined)
             throw new HttpException("Usuario no registrado", HttpStatus.INTERNAL_SERVER_ERROR);

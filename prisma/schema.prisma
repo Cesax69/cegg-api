@@ -10,10 +10,14 @@ datasource db {
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  tasks Task[]
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String?
+  lastname  String?
+  username  String?  @unique
+  password  String?
+  createdAt DateTime @default(now())
+  tasks     Task[]
 }
 
 model Task {

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
-import { User, Prisma } from './generated/prisma/client';
+import { User, Prisma, Task } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -31,21 +31,72 @@ export class UsersService {
         });
     }
 
+    public async getUser(): Promise<User[]> {
+        const user = await this.prisma.user.findMany({
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                lastname: true,
+                username: true,
+                password: false,
+                createdAt: true,
+            },
+        });
+        return user as User[];
+    }
+
+    public async getUserByUsername(username: string): Promise<User[]> {
+        const user = await this.prisma.user.findMany({
+            where: { username },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                lastname: true,
+                username: true,
+                password: false,
+                createdAt: true,
+            },
+        });
+        return user as User[];
+    }
+
     async createUser(data: Prisma.UserCreateInput): Promise<User> {
         return this.prisma.user.create({
             data,
         });
     }
 
+
     async updateUser(params: {
         where: Prisma.UserWhereUniqueInput;
         data: Prisma.UserUpdateInput;
     }): Promise<User> {
         const { where, data } = params;
-        return this.prisma.user.update({
+        const updatedUser = await this.prisma.user.update({
             data,
             where,
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                lastname: true,
+                username: true,
+                password: false,
+                createdAt: true,
+            },
         });
+        return updatedUser as User;
+    }
+
+    public async getTaskByUser(id: number): Promise<Task[]> {
+        const task = await this.prisma.task.findMany({
+            where: {
+                user_id: id,
+            },
+        });
+        return task;
     }
 
     async deleteUser(where: Prisma.UserWhereUniqueInput): Promise<User> {

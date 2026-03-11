@@ -19,4 +19,9 @@ export class CreateUserDto {
     @MaxLength(100, { message: "El nombre no debe exceder los 100 caracteres" })
     @ApiProperty({ description: "Nombre del usuario", required: false })
     name?: string;
+
+    @IsString({ message: "La contraseña debe ser un texto" })
+    @IsNotEmpty({ message: "La contraseña es requerida" })
+    @ApiProperty({ description: "Contraseña del usuario" })
+    password: string;
 }
