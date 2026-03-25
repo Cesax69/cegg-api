@@ -1,23 +1,25 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, NotFoundException, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, NotFoundException, Param, ParseIntPipe, Post, Put, UseGuards, Req } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from '../auth/dto/create-task.dto';
 import { UpdateTaskDto } from '../auth/dto/update.task.dto';
 import { Task } from '../auth/entities/task.entity';
 import { ApiProperty, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('api/task')
+@UseGuards(AuthGuard)
 @ApiTags('Tareas')
 export class TaskController {
   constructor(private readonly taskSvc: TaskService) { }
 
   @Get()
-  public async getTask(): Promise<Task[]> {
-    return await this.taskSvc.getTasks();
+  public async getTask(@Req() request: any): Promise<Task[]> {
+    return await this.taskSvc.getTasks(request.user.id);
   }
 
   @Get(':id')
-  public async getTaskById(@Param("id", ParseIntPipe) id: number): Promise<Task> {
-    const result = await this.taskSvc.getTaskById(id);
+  public async getTaskById(@Param("id", ParseIntPipe) id: number, @Req() request: any): Promise<Task> {
+    const result = await this.taskSvc.getTaskById(id, request.user.id);
     console.log("resultado",result);
   
     if(result == undefined){
@@ -29,8 +31,10 @@ export class TaskController {
 
   @Post()
   @ApiProperty({ description: "Insertar una nueva tarea" })
-  public insertTask(@Body() task: CreateTaskDto): Promise<Task> {
-    const result = this.taskSvc.insertTasks(task);
+  public async insertTask(@Body() task: CreateTaskDto, @Req() request: any): Promise<Task> {
+    const user = request['user'];
+    task.user_id = user.id;
+    const result = await this.taskSvc.insertTasks(task);
 
     if (result == undefined)
         throw new HttpException("Tarea no registrada", HttpStatus.INTERNAL_SERVER_ERROR); 
@@ -39,14 +43,14 @@ export class TaskController {
   }
 
   @Put(":id")
-  public updateTask(@Param("id", ParseIntPipe) id: number,@Body() task: UpdateTaskDto): Promise<Task> {
-    return this.taskSvc.updateTask(id, task);
+  public updateTask(@Param("id", ParseIntPipe) id: number, @Body() task: UpdateTaskDto, @Req() request: any): Promise<Task> {
+    return this.taskSvc.updateTask(id, request.user.id, task);
   }
 
   @Delete(':id')
-  public async deleteTask(@Param("id", ParseIntPipe) id: number): Promise<boolean> {
+  public async deleteTask(@Param("id", ParseIntPipe) id: number, @Req() request: any): Promise<boolean> {
     try {
-        await this.taskSvc.deleteTask(id);
+        await this.taskSvc.deleteTask(id, request.user.id);
     }catch(error){
       throw new HttpException("Task not found", HttpStatus.NOT_FOUND);
     }

@@ -19,6 +19,16 @@ model User {
   refreshToken String?
   createdAt    DateTime @default(now())
   tasks        Task[]
+  rol_id       Int?
+  rol          Rol?     @relation(fields: [rol_id], references: [id])
+
+}
+
+model Rol {
+  id          Int      @id @default(autoincrement())
+  description String   @db.VarChar(200)
+  status      Boolean
+  users       User[]
 }
 
 model Task {
