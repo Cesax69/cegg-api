@@ -1,50 +1,46 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { UtilService } from 'src/common/services/util.service';
-import { LoginDto } from './dto/login.dto';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class AuthService {
+
     constructor(
         private prisma: PrismaService,
-        private utilSvc: UtilService,
     ) { }
 
-    async login(loginDto: LoginDto): Promise<any> {
-        // 1. Verificar el username en la base de datos
-        const user = await this.prisma.user.findUnique({
-            where: { username: loginDto.username },
-        });
+    async getUserByUsername(username: string): Promise<User | null> {
+        const result = await this.prisma.user.findFirst({
+            where: { username },
+            select: {
+                id: true,
+                name: true,
+                lastname: true,
+                username: false,
+                password: true,
+                createdAt: true,
+            }
+        })
+        return result as User | null;
+    }
 
-        // 2. Si el usuario no existe, devolver UnauthorizedException 401
-        if (!user) {
-            throw new UnauthorizedException('Usuario no encontrado');
-        }
+    public async getUserById(id: number): Promise<User | null> {
+        return await this.prisma.user.findFirst({
+            where: { id }
+        })
+    }
 
-        // 3. Revisar la contraseña con checkPassword de UtilService
-        const isPasswordValid = await this.utilSvc.checkPassword(loginDto.password, user.password ?? '');
+    public async updateHash(user_id: number, hash: string | null): Promise<User> {
+        return await this.prisma.user.update({
+            where: { id: user_id },
+            data: { hash }
+        })
+    }
 
-        if (!isPasswordValid) {
-            throw new UnauthorizedException('Contraseña incorrecta');
-        }
-
-        // 4. Generar el payload {id, name, lastname, created_at}
-        const payload = this.utilSvc.getPayload(user);
-
-        // 5. Generar access token (60 segundos) y refresh token (7 días)
-        const accessToken = this.utilSvc.generateToken(payload, 60);
-        const refreshToken = this.utilSvc.generateToken(payload, 7 * 24 * 60 * 60);
-
-        // 6. Guardar el refresh token en la base de datos
+    async saveRefreshToken(user_id: number, refreshToken: string): Promise<void> {
         await this.prisma.user.update({
-            where: { id: user.id },
-            data: { refreshToken },
+            where: { id: user_id },
+            data: { refreshToken: refreshToken },
         });
-
-        // 7. Retornar access token y refresh token
-        return {
-            accessToken,
-            refreshToken,
-        };
     }
 }
