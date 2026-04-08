@@ -1,0 +1,1 @@
+{"name":"PrismaClientConstructorValidationError","message":"Using engine type \"client\" requires either \"adapter\" or \"accelerateUrl\" to be provided to PrismaClient constructor.\nRead more at https://pris.ly/d/client-constructor"}

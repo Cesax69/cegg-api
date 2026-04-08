@@ -5,8 +5,9 @@ import {
     IsNotEmpty,
     IsNumber,
     IsString,
-    MaxLength, // <-- Importar MaxLength
-    MinLength
+    MaxLength, 
+    MinLength,
+    IsOptional
 } from "class-validator";
 
 export class CreateTaskDto {
@@ -28,6 +29,7 @@ export class CreateTaskDto {
     @IsBoolean({ message: "El estado debe ser un valor booleano" })
     priority: boolean | undefined;
 
+    @IsOptional()
     @IsNumber({}, { message: "El ID del usuario debe ser un número" })
     @IsInt()
     user_id: number | undefined;

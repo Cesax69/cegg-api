@@ -1,16 +1,11 @@
-import { Injectable, forwardRef, Inject } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import * as bcrypt from "bcrypt";
-import { AuthService } from "src/modules/auth/auth.service";
 
 @Injectable()
 export class UtilService {
 
-    constructor(
-        private jwtService: JwtService,
-        @Inject(forwardRef(() => AuthService))
-        private authSvc: AuthService,
-    ) { }
+    constructor(private jwtService: JwtService) { }
 
     public async hash(text: string): Promise<string> {
         return await bcrypt.hash(text, 10);
@@ -25,6 +20,7 @@ export class UtilService {
             id: user.id,
             name: user.name,
             lastname: user.lastname,
+            rol_id: user.rol_id,
             createdAt: user.createdAt,
         };
     }
@@ -33,17 +29,17 @@ export class UtilService {
         return await this.jwtService.signAsync(payload, { expiresIn: expiresIn as any });
     }
 
-    public async generateTokens(payload: any): Promise<{ jwt: string; refreshToken: string }> {
+    public async generateTokens(payload: any, updateHashFn: (id: number, hash: string) => Promise<any>): Promise<{ acces_token: string; refresh_token: string }> {
         // Generar refresh token (7 días)
         const refreshToken = await this.generateJWT(payload, '7d');
 
         // Hashear el refresh token y guardarlo en la BD
         const hashedToken = await this.hash(refreshToken);
-        await this.authSvc.updateHash(payload.id, hashedToken);
+        await updateHashFn(payload.id, hashedToken);
 
         // Generar token de acceso (1 hora)
         const jwt = await this.generateJWT(payload, '1h');
 
-        return { jwt, refreshToken };
+        return { acces_token: jwt, refresh_token: refreshToken };
     }
 }

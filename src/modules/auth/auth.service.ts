@@ -19,6 +19,7 @@ export class AuthService {
                 username: false,
                 password: true,
                 createdAt: true,
+                rol_id: true,
             }
         })
         return result as User | null;

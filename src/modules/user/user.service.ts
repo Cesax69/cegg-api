@@ -24,6 +24,10 @@ export class UserService {
             data: {
                 email: user.email,
                 name: user.name,
+                password: user.password,
+                username: user.username,
+                lastname: user.lastname,
+                rol_id: 2 // Por defecto: Usuario normal
             },
         });
         return newUser;

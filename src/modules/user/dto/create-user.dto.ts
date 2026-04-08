@@ -20,6 +20,17 @@ export class CreateUserDto {
     @ApiProperty({ description: "Nombre del usuario", required: false })
     name?: string;
 
+    @IsOptional()
+    @IsString({ message: "El apellido debe ser un texto" })
+    @MaxLength(100, { message: "El apellido no debe exceder los 100 caracteres" })
+    @ApiProperty({ description: "Apellido del usuario", required: false })
+    lastname?: string;
+
+    @IsString({ message: "El username debe ser un texto" })
+    @IsNotEmpty({ message: "El username es requerido" })
+    @ApiProperty({ description: "Username del usuario" })
+    username: string;
+
     @IsString({ message: "La contraseña debe ser un texto" })
     @IsNotEmpty({ message: "La contraseña es requerida" })
     @ApiProperty({ description: "Contraseña del usuario" })

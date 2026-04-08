@@ -16,23 +16,20 @@ export class AuthController {
 
     @Post("login")
     @HttpCode(HttpStatus.OK)
-    @ApiOperation({ summary: "Veririfica las credenciales y genera un JWT y un refresh token" })
+    @ApiOperation({ summary: "Verifica las credenciales y genera un JWT y un refresh token" })
     public async login(@Body() auth: AuthDto): Promise<any> {
         const { username, password } = auth;
         const user = await this.authSvc.getUserByUsername(username);
 
         if (!user) {
-            throw new UnauthorizedException('el usuario y/o contraseña no existen');
+            throw new UnauthorizedException('El usuario y/o contraseña no existen');
         }
 
         if (await this.utilSvc.checkPassword(password, user.password ?? '')) {
-
             const { password, ...payload } = user;
-
-            // Generar tokens (access + refresh) y actualizar hash en BD
-            return await this.utilSvc.generateTokens(payload);
+            return await this.utilSvc.generateTokens(payload, this.authSvc.updateHash.bind(this.authSvc));
         } else {
-            throw new UnauthorizedException('el usuario y/o contraseña no existen');
+            throw new UnauthorizedException('El usuario y/o contraseña no existen');
         }
     }
 
@@ -45,20 +42,14 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     @UseGuards(AuthGuard)
     public async refreshToken(@Req() request: any) {
-        //Obtener el usuario en sesion
         const userSession = request['user'];
         const user = await this.authSvc.getUserById(userSession.id);
         if (!user || !user.hash) throw new AppException("Acceso denegado", HttpStatus.FORBIDDEN);
 
-        //Comparar el token recibido con el token guardado
         if (userSession.hash != user.hash) throw new AppException("Acceso denegado", HttpStatus.FORBIDDEN);
     
-
-        //Si el token es valido se generan nuevos token's
         const { password, hash, ...payload } = user;
-        return await this.utilSvc.generateTokens(payload);
-
-        
+        return await this.utilSvc.generateTokens(payload, this.authSvc.updateHash.bind(this.authSvc));
      }
 
      @Post("logout")
@@ -66,7 +57,7 @@ export class AuthController {
      @UseGuards(AuthGuard)
     public async logout(@Req() request: any) {
         const session = request['user'];
-        const user = await this.authSvc.updateHash(session.id, null);
+        await this.authSvc.updateHash(session.id, null);
         return true;
      }
 }

@@ -1,0 +1,4 @@
+{
+  "name": "PrismaClientInitializationError",
+  "message": "`PrismaClient` needs to be constructed with a non-empty, valid `PrismaClientOptions`:\n\n```\nnew PrismaClient({\n  ...\n})\n```\n\nor\n\n```\nconstructor() {\n  super({ ... });\n}\n```\n          "
+}

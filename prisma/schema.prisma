@@ -3,10 +3,12 @@
 
 generator client {
   provider = "prisma-client-js"
+  engineType = "library"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -20,6 +22,7 @@ model User {
   refreshToken String?
   createdAt    DateTime @default(now())
   tasks        Task[]
+  logs         Log[]
   rol_id       Int?
   rol          Rol?     @relation(fields: [rol_id], references: [id])
 
@@ -41,4 +44,16 @@ model Task {
   user        User?    @relation(fields: [user_id], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Log {
+  id          Int      @id @default(autoincrement())
+  statusCode  Int      
+  timestamp   DateTime 
+  path        String   @db.Text
+  error       String   @db.Text
+  errorCode   String   @db.Text
+  session_id  Int?
+
+  user User? @relation(fields: [session_id], references: [id])   
 }
