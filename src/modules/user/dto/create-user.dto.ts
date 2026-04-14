@@ -5,6 +5,8 @@ import {
     IsOptional,
     IsString,
     MaxLength,
+    MinLength,
+    Matches,
 } from "class-validator";
 
 export class CreateUserDto {
@@ -28,11 +30,16 @@ export class CreateUserDto {
 
     @IsString({ message: "El username debe ser un texto" })
     @IsNotEmpty({ message: "El username es requerido" })
+    @MinLength(3, { message: "El username debe tener al menos 3 caracteres" })
+    @MaxLength(50, { message: "El username no debe exceder los 50 caracteres" })
     @ApiProperty({ description: "Username del usuario" })
     username: string;
 
     @IsString({ message: "La contraseña debe ser un texto" })
     @IsNotEmpty({ message: "La contraseña es requerida" })
+    @MinLength(8, { message: "La contraseña debe tener al menos 8 caracteres" })
+    @MaxLength(128, { message: "La contraseña no debe exceder los 128 caracteres" })
+    @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, { message: "La contraseña es muy débil. Debe tener minúsculas, mayúsculas y números o símbolos." })
     @ApiProperty({ description: "Contraseña del usuario" })
     password: string;
 }

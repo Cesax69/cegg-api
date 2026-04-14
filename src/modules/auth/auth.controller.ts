@@ -35,8 +35,11 @@ export class AuthController {
 
     @Get("profile")
     @HttpCode(HttpStatus.OK)
+    @UseGuards(AuthGuard)
     @ApiOperation({ summary: "Extrae el ID del usuario desde el token y busca la informacion" })
-    public getProfile() { }
+    public getProfile(@Req() request: any) {
+        return request['user'];
+    }
 
     @Post("refresh-token")
     @HttpCode(HttpStatus.OK)

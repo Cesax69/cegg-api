@@ -15,4 +15,9 @@ export class UpdateUserDto {
     @IsString({ message: "El nombre debe ser un texto" })
     @MaxLength(100, { message: "El nombre no debe exceder los 100 caracteres" })
     name?: string;
+
+    @IsOptional()
+    @IsString({ message: "El apellido debe ser un texto" })
+    @MaxLength(100, { message: "El apellido no debe exceder los 100 caracteres" })
+    lastname?: string;
 }

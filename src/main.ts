@@ -3,15 +3,19 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
+import helmet from 'helmet';
+
 async function bootstrap() {
   try {
     const app = await NestFactory.create(AppModule);
 
-  app.enableCors({
-    origin: '*',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true,
-  });
+    app.use(helmet());
+
+    app.enableCors({
+      origin: 'http://localhost:5173',
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+      credentials: true,
+    });
 
   const basicAuth = require('express-basic-auth');
   const authMiddleware = basicAuth({
@@ -23,7 +27,11 @@ async function bootstrap() {
   app.use('/docs', authMiddleware);
   app.use('/docs-json', authMiddleware);
 
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+    app.useGlobalPipes(new ValidationPipe({ 
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true 
+    }));
 
     const config = new DocumentBuilder()
       .setTitle('Nexus API')

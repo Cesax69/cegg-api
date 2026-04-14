@@ -56,12 +56,12 @@ export class AllExceptionFilter implements ExceptionFilter {
             console.error('CRITICAL: Failed to write to Log table:', dbError);
         }
         
+        const isInternalError = status >= 500;
         response.status(status).json({
             statusCode: status,
             timestamp: new Date().toISOString(),
             path: request.url,
-            error: errorText,
-            errorCode,
+            error: isInternalError ? 'Error interno del servidor' : errorText,
         });
     }
 }

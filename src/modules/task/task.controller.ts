@@ -21,7 +21,7 @@ export class TaskController {
 
   @Get('all')
   @UseGuards(RolesGuard)
-  @Roles(1) // Solo Admin
+  @Roles(1) 
   public async getAllTasks(): Promise<Task[]> {
     return await this.taskSvc.getAllTasks();
   }
@@ -51,7 +51,7 @@ export class TaskController {
 
   @Post('assign')
   @UseGuards(RolesGuard)
-  @Roles(1) // Solo Admin
+  @Roles(1) 
   @ApiProperty({ description: "Asignar tarea a un usuario específico (Solo Admin)" })
   public async assignTaskToUser(@Body() task: CreateTaskDto): Promise<Task> {
     if (!task.user_id) {

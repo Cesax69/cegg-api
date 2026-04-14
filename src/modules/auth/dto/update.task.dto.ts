@@ -11,8 +11,6 @@ import {
 
 export class UpdateTaskDto {
 
-    id?: number;
-
     @IsString({ message: "El nombre debe ser un texto" })
     @IsNotEmpty()
     @MinLength(3, { message: "El nombre debe tener al menos 3 caracteres" })

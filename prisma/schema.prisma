@@ -41,7 +41,7 @@ model Task {
   description String?  @db.VarChar(250)
   priority    Boolean  @default(false)
   user_id     Int?
-  user        User?    @relation(fields: [user_id], references: [id])
+  user        User?    @relation(fields: [user_id], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -55,5 +55,5 @@ model Log {
   errorCode   String   @db.Text
   session_id  Int?
 
-  user User? @relation(fields: [session_id], references: [id])   
+  user User? @relation(fields: [session_id], references: [id], onDelete: Cascade)
 }

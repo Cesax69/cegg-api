@@ -7,4 +7,5 @@ export class User {
     hash: string | null;
     password: string | null;
     createdAt: Date;
+    rol_id: number | null;
 }

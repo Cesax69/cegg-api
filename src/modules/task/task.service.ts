@@ -52,27 +52,30 @@ export class TaskService {
     }
 
     async updateTask(id: number, user_id: number, taskUpdate: UpdateTaskDto, userRol: number = 2): Promise<any> {
-        let whereClause: any = { id };
-        // Si no es admin, solo puede actualizar sus propias tareas
         if (userRol !== 1) {
-            whereClause.user_id = user_id;
+            const existingTask = await this.prisma.task.findUnique({ where: { id } });
+            if (!existingTask || existingTask.user_id !== user_id) {
+                throw new Error("No tienes acceso a esta tarea");
+            }
         }
 
         const updatedTask = await this.prisma.task.update({
-            where: whereClause,
+            where: { id },
             data: { ...taskUpdate },
         });
         return updatedTask;
     }
 
     async deleteTask(id: number, user_id: number, userRol: number = 2): Promise<any> {
-        let whereClause: any = { id };
         if (userRol !== 1) {
-            whereClause.user_id = user_id;
+            const existingTask = await this.prisma.task.findUnique({ where: { id } });
+            if (!existingTask || existingTask.user_id !== user_id) {
+                throw new Error("No tienes acceso a esta tarea");
+            }
         }
 
         const deletedTask = await this.prisma.task.delete({ 
-            where: whereClause
+            where: { id }
         });
         return deletedTask;
     }
