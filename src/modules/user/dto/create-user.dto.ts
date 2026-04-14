@@ -39,7 +39,7 @@ export class CreateUserDto {
     @IsNotEmpty({ message: "La contraseña es requerida" })
     @MinLength(8, { message: "La contraseña debe tener al menos 8 caracteres" })
     @MaxLength(128, { message: "La contraseña no debe exceder los 128 caracteres" })
-    @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, { message: "La contraseña es muy débil. Debe tener minúsculas, mayúsculas y números o símbolos." })
+    @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])[^\s]+$/, { message: "La contraseña es muy débil o contiene espacios. Debe tener minúsculas, mayúsculas y números o símbolos." })
     @ApiProperty({ description: "Contraseña del usuario" })
     password: string;
 }
